@@ -1,9 +1,15 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
 from django.db import models
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, first_name, last_name, phone, password=None, role='user'):
+    def create_user(
+        self, email, first_name, last_name, phone, password=None, role="user"
+    ):
         if not email:
             raise ValueError("Email обязателен")
         email = self.normalize_email(email)
@@ -12,14 +18,16 @@ class UserManager(BaseUserManager):
             first_name=first_name,
             last_name=last_name,
             phone=phone,
-            role=role
+            role=role,
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
     def create_superuser(self, email, first_name, last_name, phone, password=None):
-        user = self.create_user(email, first_name, last_name, phone, password, role='admin')
+        user = self.create_user(
+            email, first_name, last_name, phone, password, role="admin"
+        )
         user.is_superuser = True
         user.is_staff = True
         user.save(using=self._db)
@@ -28,24 +36,28 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     USER_ROLES = [
-        ('user', 'User'),
-        ('admin', 'Admin'),
+        ("user", "User"),
+        ("admin", "Admin"),
     ]
 
     email = models.EmailField(unique=True, verbose_name="Email")
     first_name = models.CharField(max_length=50, verbose_name="Имя")
     last_name = models.CharField(max_length=50, verbose_name="Фамилия")
     phone = models.CharField(max_length=20, verbose_name="Телефон")
-    role = models.CharField(max_length=10, choices=USER_ROLES, default='user', verbose_name="Роль")
-    image = models.ImageField(upload_to='users_avatars/', null=True, blank=True, verbose_name="Аватар")
+    role = models.CharField(
+        max_length=10, choices=USER_ROLES, default="user", verbose_name="Роль"
+    )
+    image = models.ImageField(
+        upload_to="users_avatars/", null=True, blank=True, verbose_name="Аватар"
+    )
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'phone']
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["first_name", "last_name", "phone"]
 
     class Meta:
         verbose_name = "Пользователь"
