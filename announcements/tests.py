@@ -8,14 +8,14 @@ from django.contrib.auth import get_user_model
 class TestAds:
     def test_list_ads_anonymous(self, api_client):
         """Аноним может просматривать список объявлений"""
-        url = reverse('announcements:ads-list')
+        url = reverse("announcements:ads-list")
         response = api_client.get(url)
         assert response.status_code == 200
 
     def test_create_ad_authenticated(self, api_client, test_user):
         """Авторизованный пользователь может создать объявление"""
         api_client.force_authenticate(user=test_user)
-        url = reverse('announcements:ads-list')
+        url = reverse("announcements:ads-list")
         data = {"title": "iPhone 15", "price": 100000, "description": "New"}
         response = api_client.post(url, data)
         assert response.status_code == 201
@@ -26,7 +26,7 @@ class TestAds:
         ad = Ad.objects.create(title="MacBook", price=200, author=admin_user)
 
         api_client.force_authenticate(user=test_user)
-        url = reverse('announcements:ads-detail', args=[ad.id])
+        url = reverse("announcements:ads-detail", args=[ad.id])
         response = api_client.patch(url, {"title": "Hacked"})
         assert response.status_code == 403
 
@@ -35,7 +35,7 @@ class TestAds:
         ad = Ad.objects.create(title="User Ad", price=10, author=test_user)
 
         api_client.force_authenticate(user=admin_user)
-        url = reverse('announcements:ads-detail', args=[ad.id])
+        url = reverse("announcements:ads-detail", args=[ad.id])
         response = api_client.delete(url)
         assert response.status_code == 204
         assert Ad.objects.count() == 0
@@ -45,10 +45,10 @@ class TestAds:
         Ad.objects.create(title="Xiaomi", price=10, author=test_user)
         Ad.objects.create(title="Samsung", price=10, author=test_user)
 
-        url = reverse('announcements:ads-list')
+        url = reverse("announcements:ads-list")
         response = api_client.get(url, {"search": "Xiaomi"})
-        assert len(response.data['results']) == 1
-        assert response.data['results'][0]['title'] == "Xiaomi"
+        assert len(response.data["results"]) == 1
+        assert response.data["results"][0]["title"] == "Xiaomi"
 
 
 @pytest.mark.django_db
@@ -56,7 +56,7 @@ def test_create_review(api_client, test_user):
     ad = Ad.objects.create(title="Test Ad", price=100, author=test_user)
     api_client.force_authenticate(user=test_user)
 
-    url = reverse('announcements:ad-reviews', args=[ad.id])
+    url = reverse("announcements:ad-reviews", args=[ad.id])
     response = api_client.post(url, {"text": "Great item!"})
 
     assert response.status_code == 201
@@ -68,7 +68,9 @@ def test_create_review(api_client, test_user):
 def test_retrieve_reviews_for_specific_ad(api_client, test_user):
     user1 = test_user
     User = get_user_model()
-    user2 = User.objects.create_user(email="user2@test.com", first_name="P", last_name="S", phone="124", password="p")
+    user2 = User.objects.create_user(
+        email="user2@test.com", first_name="P", last_name="S", phone="124", password="p"
+    )
 
     ad1 = Ad.objects.create(title="Ad 1", price=100, author=user1)
     ad2 = Ad.objects.create(title="Ad 2", price=200, author=user2)
@@ -78,10 +80,10 @@ def test_retrieve_reviews_for_specific_ad(api_client, test_user):
 
     api_client.force_authenticate(user=user1)
 
-    url = reverse('announcements:ad-reviews', args=[ad1.id])
+    url = reverse("announcements:ad-reviews", args=[ad1.id])
     response = api_client.get(url)
 
     assert response.status_code == 200
 
-    assert len(response.data['results']) == 1
-    assert response.data['results'][0]['text'] == "Review 1 for Ad 1"
+    assert len(response.data["results"]) == 1
+    assert response.data["results"][0]["text"] == "Review 1 for Ad 1"

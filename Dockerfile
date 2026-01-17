@@ -1,6 +1,5 @@
 FROM python:3.13-slim
 
-# Установка системных зависимостей для psycopg2 и Pillow
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     gcc \
@@ -21,9 +20,6 @@ COPY pyproject.toml poetry.lock* ./
 RUN poetry install --no-root --no-interaction --no-ansi
 
 COPY . .
-
-# Собираем статику (необязательно, если есть Nginx, но полезно)
-# RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
