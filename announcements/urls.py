@@ -1,6 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+
+from .apps import AnnouncementsConfig
 from .views import AdViewSet, ReviewViewSet
+
+
+app_name = AnnouncementsConfig.name
 
 router = DefaultRouter()
 router.register(r"ads", AdViewSet, basename="ads")

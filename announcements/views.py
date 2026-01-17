@@ -11,7 +11,7 @@ from drf_spectacular.types import OpenApiTypes
 @extend_schema_view(
     list=extend_schema(
         summary="Список объявлений",
-        description="Возвращает список объявлений. Пагинация по 4 объекта. Поиск по полю 'title'."
+        description="Возвращает список объявлений. Пагинация по 4 объекта. Поиск по полю 'title'.",
     ),
 )
 class AdViewSet(viewsets.ModelViewSet):
